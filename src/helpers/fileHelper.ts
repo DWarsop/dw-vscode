@@ -1,7 +1,5 @@
 import * as vscode from "vscode";
-import { MessageHelper } from "./messageHelper";
-
-let messageHelper: MessageHelper = new MessageHelper();
+import * as path from "path";
 
 export class FileHelper {
   returnCurrentWorkspace(): vscode.WorkspaceFolder | undefined {
@@ -16,54 +14,37 @@ export class FileHelper {
     return path;
   }
 
-  async returnFilePath(
-    filename: string,
-    workspaceFolder: vscode.WorkspaceFolder
-  ): Promise<vscode.Uri | undefined> {
-    let pattern = new vscode.RelativePattern(workspaceFolder, filename);
-    let uri = await vscode.workspace.findFiles(pattern, "", 1);
-    return uri[0];
+  returnFilePath(filename: string, rootPath: string): vscode.Uri {
+    return vscode.Uri.file(path.join(rootPath, filename));
   }
 
-  async getValueFromJSONConfig(
-    key: string,
-    configUri: vscode.Uri
-  ): Promise<string> {
-    var value: string = "";
-
-    await vscode.workspace.openTextDocument(configUri).then((document) => {
-      if (document.lineCount > 0) {
-        try {
-          let configJSON = JSON.parse(document.getText());
-          if (configJSON !== undefined) {
-            value = configJSON[key];
-          }
-        } catch (error) {}
-      }
-    });
-
-    if (value === undefined) {
-      value = "";
-    }
-
-    return value;
+  async getTextDocumentFromFilePath(
+    fileUri: vscode.Uri
+  ): Promise<vscode.TextDocument | undefined> {
+    return await vscode.workspace.openTextDocument(fileUri);
   }
 
-  deleteFile(fileUri: vscode.Uri): boolean {
+  deleteFile(fileUri: vscode.Uri): [boolean, string] {
     var deleted: boolean = false;
+    var error: string = "";
 
     vscode.workspace.fs.delete(fileUri).then(
-      (scs) => {
-        messageHelper.displayInfoMessage("File deleted.");
+      (resolve) => {
         deleted = true;
       },
-      (err) => {
-        messageHelper.displayErrorMessage(
-          "File could not be deleted due to the following: " + err
-        );
+      (reject) => {
+        error = reject;
       }
     );
 
-    return deleted;
+    return [deleted, error];
+  }
+
+  openFile(fileUri: vscode.Uri) {
+    vscode.commands.executeCommand("vscode.open", fileUri);
+  }
+
+  openFolder(folderUri: vscode.Uri) {
+    vscode.commands.executeCommand("vscode.openFolder", folderUri);
   }
 }

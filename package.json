@@ -11,15 +11,16 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:dw-vs.al_sayUpdateMethod"
+    "workspaceContains:app.json",
+    "onLanguage:al"
   ],
   "main": "./out/contexts/extension.js",
   "contributes": {
     "commands": [
       {
         "category": "DW: AL",
-        "command": "dw-vs.al_sayUpdateMethod",
-        "title": "Say Update Method"
+        "command": "dw-vs.al_publish",
+        "title": "Publish"
       }
     ]
   },
