@@ -1,25 +1,48 @@
 import * as vscode from "vscode";
 import { ALDevelopmentContext } from "../contexts/alDevelopmentContext";
 import { FileHelper } from "../helpers/fileHelper";
-import * as ALLABELS from "../constants/alLabels";
+import * as ALRESOURCES from "../constants/alResources";
 
 interface LaunchConfigFile {
   schemaUpdateMode: string;
 }
 
 interface AppConfigFile {
+  name: string;
   runtime: string;
+  idRanges: AppConfigFileIdRanges[];
+}
+
+interface AppConfigFileIdRanges {
+  from: number;
+  to: number;
+}
+
+interface AppSourceCopConfigFile {
+  mandatoryAffixes: string[];
+}
+
+export interface ALFileDetail {
+  type: ALRESOURCES.ObjectTypes | undefined;
+  priority: number;
+  id: number;
+  fullName: string;
+  name: string;
+  modifier: string;
+  modifierName: string;
 }
 
 export class ALFileService {
   //Class globals
   protected _context: ALDevelopmentContext;
   protected _aLWorkspace?: string;
+  protected _fileHelper: FileHelper;
 
   constructor(context: ALDevelopmentContext) {
     //Context globals
     this._context = context;
     this._aLWorkspace = undefined;
+    this._fileHelper = new FileHelper();
 
     //Call on construction
     this.setWithinALWorkspace();
@@ -43,7 +66,7 @@ export class ALFileService {
 
     if (!within) {
       this._context.alDisplayService.displayErrorMessage(
-        ALLABELS.missingWorkspaceErr
+        ALRESOURCES.missingWorkspaceErr
       );
     }
 
@@ -51,8 +74,6 @@ export class ALFileService {
   }
 
   setWithinALWorkspace() {
-    let fileHelper: FileHelper = new FileHelper();
-
     let workspacePath =
       this._context.alExtensionService.retrieveLastActiveWorkspacePath();
 
@@ -62,7 +83,7 @@ export class ALFileService {
 
     if (workspacePath !== undefined) {
       if (
-        fileHelper.returnFilePath(ALLABELS.appJsonPath, workspacePath) !==
+        this._fileHelper.getFilePath(ALRESOURCES.appJsonName, workspacePath) !==
         undefined
       ) {
         this._aLWorkspace = workspacePath;
@@ -70,31 +91,51 @@ export class ALFileService {
     }
   }
 
-  getLaunchFilePath(): vscode.Uri | undefined {
-    let fileHelper: FileHelper = new FileHelper();
+  getALWorkspaceUri(): vscode.Uri | undefined {
+    if (this._aLWorkspace !== undefined) {
+      return this._fileHelper.pathToUri(this._aLWorkspace);
+    } else {
+      return undefined;
+    }
+  }
 
-    return fileHelper.returnFilePath(
-      ALLABELS.launchJsonPath,
+  getLaunchFileUri(): vscode.Uri {
+    return this._fileHelper.getFilePath(
+      ALRESOURCES.launchJsonPath,
       this._aLWorkspace!
     );
   }
 
+  async launchFileExists(): Promise<boolean> {
+    return await this._fileHelper.uriExists(this.getLaunchFileUri());
+  }
+
   openLaunchFile() {
-    let fileHelper: FileHelper = new FileHelper();
-    let launchUri = this.getLaunchFilePath();
+    let launchUri = this.getLaunchFileUri();
 
     if (launchUri !== undefined) {
-      fileHelper.openFile(launchUri);
+      this._fileHelper.openFile(launchUri);
     }
   }
 
-  async getLaunchFileConfigs(): Promise<LaunchConfigFile[] | undefined> {
-    let fileHelper: FileHelper = new FileHelper();
+  getObjectsFolderUri(): vscode.Uri {
+    return this._fileHelper.getFilePath(
+      ALRESOURCES.objectsFolder,
+      this._aLWorkspace!
+    );
+  }
 
-    let launchUri = this.getLaunchFilePath();
+  async objectFolderExists(): Promise<boolean> {
+    return await this._fileHelper.uriExists(this.getObjectsFolderUri());
+  }
+
+  async getLaunchFileConfigs(): Promise<LaunchConfigFile[] | undefined> {
+    let launchUri = this.getLaunchFileUri();
 
     if (launchUri !== undefined) {
-      let launchFile = await fileHelper.getTextDocumentFromFilePath(launchUri);
+      let launchFile = await this._fileHelper.getTextDocumentFromFilePath(
+        launchUri
+      );
       if (launchFile !== undefined) {
         let launchJson = JSON.parse(launchFile.getText());
         let launchFileConfigs: LaunchConfigFile[] = [];
@@ -119,15 +160,15 @@ export class ALFileService {
   }
 
   async getAppFileConfig(): Promise<AppConfigFile | undefined> {
-    let fileHelper: FileHelper = new FileHelper();
-
-    let appUri = fileHelper.returnFilePath(
-      ALLABELS.appJsonPath,
-      this._aLWorkspace!
+    let appJsonFile = await this.getFilesFromALWorkspace(
+      "**/" + ALRESOURCES.appJsonName,
+      1
     );
 
-    if (appUri !== undefined) {
-      let appFile = await fileHelper.getTextDocumentFromFilePath(appUri);
+    if (appJsonFile[0] !== undefined) {
+      let appFile = await this._fileHelper.getTextDocumentFromFilePath(
+        appJsonFile[0]
+      );
       if (appFile !== undefined) {
         let appJson = JSON.parse(appFile.getText());
 
@@ -140,9 +181,248 @@ export class ALFileService {
 
   translateJsonToAppConfigFile(configJson: any) {
     let appConfigFile: AppConfigFile = {
+      name: configJson["name"],
       runtime: configJson["runtime"],
+      idRanges: configJson["idRanges"],
     };
 
     return appConfigFile;
+  }
+
+  async getAppSourceCopFileConfig(): Promise<
+    AppSourceCopConfigFile | undefined
+  > {
+    let appSourceCopJsonFile = await this.getFilesFromALWorkspace(
+      "**/" + ALRESOURCES.appSourceCopJsonName,
+      1
+    );
+
+    if (appSourceCopJsonFile[0] !== undefined) {
+      let appFile = await this._fileHelper.getTextDocumentFromFilePath(
+        appSourceCopJsonFile[0]
+      );
+      if (appFile !== undefined) {
+        let appJson = JSON.parse(appFile.getText());
+
+        return this.translateJsonToAppSourceCopConfigFile(appJson);
+      }
+    }
+
+    return undefined;
+  }
+
+  translateJsonToAppSourceCopConfigFile(configJson: any) {
+    let appSourceCopConfigFile: AppSourceCopConfigFile = {
+      mandatoryAffixes: configJson["mandatoryAffixes"],
+    };
+
+    return appSourceCopConfigFile;
+  }
+
+  createFileInALWorkspace(
+    filePath: string,
+    fileName: string,
+    content: string
+  ): Promise<vscode.Uri> {
+    let creationFileUri = vscode.Uri.joinPath(
+      this.getALWorkspaceUri()!,
+      filePath
+    );
+    return this._fileHelper.createFile(
+      creationFileUri,
+      fileName,
+      Buffer.from(content)
+    );
+  }
+
+  createFolderInALWorkspace(
+    filePath: string,
+    folderName: string
+  ): Promise<vscode.Uri> {
+    let creationFileUri = vscode.Uri.joinPath(
+      this.getALWorkspaceUri()!,
+      filePath
+    );
+
+    return this._fileHelper.createFolder(creationFileUri, folderName);
+  }
+
+  async createObjectsFolderInALWorkspace(): Promise<vscode.Uri> {
+    if (!this.objectFolderExists()) {
+      return await this.createFolderInALWorkspace(
+        "",
+        ALRESOURCES.objectsFolder
+      );
+    } else {
+      return this.getObjectsFolderUri();
+    }
+  }
+
+  async getFilesFromALWorkspace(
+    includePattern: string,
+    maxResults: number
+  ): Promise<vscode.Uri[]> {
+    let workspacePattern = new vscode.RelativePattern(
+      this.getALWorkspaceUri()!,
+      includePattern
+    );
+    return await this._fileHelper.getFilesFromWorkspace(
+      workspacePattern,
+      maxResults
+    );
+  }
+
+  async getALDetailsFromFile(
+    fileUri: vscode.Uri
+  ): Promise<ALFileDetail | undefined> {
+    let alFileDetail: ALFileDetail = {
+      priority: 0,
+      type: undefined,
+      id: 0,
+      fullName: "",
+      name: "",
+      modifier: "",
+      modifierName: "",
+    };
+    let document = await this._fileHelper.getTextDocumentFromFilePath(fileUri);
+
+    if (document !== undefined && document.lineCount > 0) {
+      let alHeaderLine: string = "";
+
+      let lineNo: number = 0;
+      do {
+        let currentLineText = document.lineAt(lineNo).text;
+        if (new RegExp(ALRESOURCES.objectTypeRegEx).test(currentLineText)) {
+          alHeaderLine = currentLineText;
+        }
+        lineNo += 1;
+      } while (alHeaderLine === "" && lineNo <= document.lineCount - 1);
+
+      if (alHeaderLine !== "") {
+        let alHeaderSections = alHeaderLine.match(
+          new RegExp(ALRESOURCES.wordQuoteBoundaryRegEx)
+        );
+        if (alHeaderSections !== null) {
+          for (let i = 0; i < alHeaderSections.length; i++) {
+            let value = alHeaderSections[i];
+            switch (i) {
+              case 0:
+                alFileDetail.type = <ALRESOURCES.ObjectTypes>value;
+                alFileDetail.priority =
+                  ALRESOURCES.objectTypeInformation[alFileDetail.type].priority;
+                break;
+              case 1:
+                alFileDetail.id = parseInt(value);
+                break;
+              case 2:
+                alFileDetail.fullName = value;
+                let affix = await this.getAffix();
+                alFileDetail.name = value
+                  .replace(affix + " ", "")
+                  .replace(affix, "");
+                break;
+              case 3:
+                alFileDetail.modifier = value;
+                break;
+              case 4:
+                alFileDetail.modifierName = value;
+                break;
+            }
+          }
+
+          return alFileDetail;
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  async getAffix(): Promise<string> {
+    let appSourceCopConfig = await this.getAppSourceCopFileConfig();
+
+    if (appSourceCopConfig !== undefined) {
+      return appSourceCopConfig.mandatoryAffixes[0];
+    }
+
+    return "";
+  }
+
+  async getIdRanges(): Promise<AppConfigFileIdRanges[] | undefined> {
+    let appFileConfig = await this.getAppFileConfig();
+
+    if (appFileConfig !== undefined) {
+      return appFileConfig.idRanges;
+    }
+
+    return undefined;
+  }
+
+  async buildFileName(fileName: string): Promise<string> {
+    let affix = await this.getAffix();
+
+    if (affix !== "") {
+      return `${affix} ${fileName}`;
+    } else {
+      return `${fileName}`;
+    }
+  }
+
+  async getNextAvailableId(
+    objectType: ALRESOURCES.ObjectTypes
+  ): Promise<number> {
+    let idRanges = await this.getIdRanges();
+    let alFileDetails: ALFileDetail[] = [];
+
+    let workspaceFiles =
+      await this._context.alFileService.getFilesFromALWorkspace(
+        ALRESOURCES.alFileSearchPattern,
+        1000
+      );
+
+    if (workspaceFiles.length > 0) {
+      await Promise.all(
+        workspaceFiles.map(async (file, i, arr) => {
+          let alFileDetail =
+            await this._context.alFileService.getALDetailsFromFile(file);
+          if (alFileDetail !== undefined && alFileDetail.type === objectType) {
+            alFileDetails.push(alFileDetail);
+          }
+        })
+      );
+
+      alFileDetails.sort((a, b) => (a.id < b.id ? -1 : 1));
+
+      if (alFileDetails.length > 0) {
+        let newId = 0;
+
+        if (idRanges !== undefined) {
+          idRanges.forEach((range) => {
+            let rangeId = range.from;
+
+            do {
+              if (
+                alFileDetails.find((file) => file.id === rangeId) === undefined
+              ) {
+                newId = rangeId;
+              }
+              rangeId += 1;
+            } while (newId === 0 && rangeId <= range.to);
+          });
+        }
+
+        if (newId > 0) {
+          return newId;
+        }
+      }
+
+      if (idRanges !== undefined) {
+        if (idRanges[0].from > 0) {
+          return idRanges[0].from;
+        }
+      }
+    }
+
+    return 50000;
   }
 }

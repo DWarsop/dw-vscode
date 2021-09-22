@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { ALDevelopmentContext } from "../contexts/alDevelopmentContext";
 import * as ALSERVICES from "../constants/alExtensionServices";
-import * as ALLABELS from "../constants/alLabels";
+import * as ALRESOURCES from "../constants/alResources";
 import * as ALCOMMANDS from "../constants/alCommands";
 
 export class ALExtensionService {
@@ -25,7 +25,7 @@ export class ALExtensionService {
   }
 
   async retrieveALExtensionAPI() {
-    let alExtension = vscode.extensions.getExtension(ALLABELS.alExtensionId);
+    let alExtension = vscode.extensions.getExtension(ALRESOURCES.alExtensionId);
 
     if (!alExtension) {
       this._context.alDisplayService.writeConsoleMessage(
@@ -40,7 +40,13 @@ export class ALExtensionService {
 
   retrieveLastActiveWorkspacePath(): string | undefined {
     if (this.alExtensionAPI !== undefined) {
-      return this.alExtensionAPI[ALSERVICES.editor].lastActiveWorkspacePath;
+      let lastActiveWorkspacePath =
+        this.alExtensionAPI[ALSERVICES.editor].lastActiveWorkspacePath;
+
+      //Performing null check due to AL extension not returning undefined
+      if (lastActiveWorkspacePath !== null) {
+        return lastActiveWorkspacePath;
+      }
     }
 
     return undefined;
@@ -59,7 +65,9 @@ export class ALExtensionService {
 
       if (launchFileConfigs !== undefined) {
         launchFileConfigs.forEach((config) => {
-          if (config.schemaUpdateMode === ALLABELS.recreateSchemaUpdateMode) {
+          if (
+            config.schemaUpdateMode === ALRESOURCES.recreateSchemaUpdateMode
+          ) {
             displayWarning = true;
           }
         });
@@ -68,16 +76,16 @@ export class ALExtensionService {
       if (displayWarning) {
         let response =
           await this._context.alDisplayService.displayWarningMessageWithItems(
-            ALLABELS.schemaUpdateMethodQst,
+            ALRESOURCES.schemaUpdateMethodQst,
             false,
-            [ALLABELS.continueAction, ALLABELS.configurationsAction]
+            [ALRESOURCES.continueAction, ALRESOURCES.configurationsAction]
           );
 
         switch (response) {
-          case ALLABELS.continueAction: {
+          case ALRESOURCES.continueAction: {
             break;
           }
-          case ALLABELS.configurationsAction: {
+          case ALRESOURCES.configurationsAction: {
             this._context.alFileService.openLaunchFile();
             return;
           }

@@ -83,7 +83,7 @@ export class ALDisplayService {
 
   writeConsoleMessage(message: string) {
     if (this._outputChannel !== undefined) {
-      this._outputChannel.appendLine(message);
+      this._outputChannel.appendLine(message + "\n");
     }
   }
 }

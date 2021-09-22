@@ -2,8 +2,9 @@
   "name": "dw-vs",
   "displayName": "DW VS Code",
   "description": "",
-  "publisher": "David Warsop",
-  "version": "0.0.1",
+  "publisher": "DavidWarsop",
+  "version": "1.0.0",
+  "repository": "https://github.com/DWarsop/dw-vscode}",
   "engines": {
     "vscode": "^1.52.0"
   },
@@ -21,6 +22,11 @@
         "category": "DW: AL",
         "command": "dw-vs.al_publish",
         "title": "Publish"
+      },
+      {
+        "category": "DW: AL",
+        "command": "dw-vs.al_createPermissionSet",
+        "title": "Create Permission Set"
       }
     ]
   },

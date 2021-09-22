@@ -4,7 +4,8 @@ import * as vscode from "vscode";
 import { ALDisplayService } from "../services/alDisplayService";
 import { ALExtensionService } from "../services/alExtensionService";
 import { ALFileService } from "../services/alFileService";
-import { ALInformationService } from "../services/alInformationService";
+import { ALContentService as ALContentService } from "../services/alContentService";
+import { ALPermissionService } from "../services/alPermissionService";
 
 export class ALDevelopmentContext implements vscode.Disposable {
   //Contexts
@@ -14,7 +15,8 @@ export class ALDevelopmentContext implements vscode.Disposable {
   alDisplayService: ALDisplayService;
   alExtensionService: ALExtensionService;
   alFileService: ALFileService;
-  alInformationService: ALInformationService;
+  alContentService: ALContentService;
+  alPermissionService: ALPermissionService;
 
   constructor(context: vscode.ExtensionContext) {
     this.vscodeExtensionContext = context;
@@ -23,7 +25,8 @@ export class ALDevelopmentContext implements vscode.Disposable {
     this.alDisplayService = new ALDisplayService(this);
     this.alExtensionService = new ALExtensionService(this);
     this.alFileService = new ALFileService(this);
-    this.alInformationService = new ALInformationService(this);
+    this.alContentService = new ALContentService(this);
+    this.alPermissionService = new ALPermissionService(this);
   }
 
   dispose() {}
