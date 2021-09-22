@@ -1,10 +1,11 @@
 {
   "name": "dw-vs",
-  "displayName": "DW VS Code",
-  "description": "",
-  "publisher": "DavidWarsop",
-  "version": "1.0.0",
+  "displayName": "DW: VS Code",
+  "description": "A personal extension, providing helpful functionality for my daily usage.",
+  "publisher": "DWarsop",
+  "version": "1.1.0",
   "repository": "https://github.com/DWarsop/dw-vscode}",
+  "icon": "icon.jpg",
   "engines": {
     "vscode": "^1.52.0"
   },

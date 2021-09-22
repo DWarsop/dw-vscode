@@ -1,9 +1,9 @@
 # Change Log
 
-All notable changes to the "dw-vs" extension will be documented in this file.
+## 1.0.0
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+- Added [DW: AL: Publish]
 
-## [Unreleased]
+## 1.1.0
 
-- Initial release
+- Added [DW: AL: Create Permission Set]
