@@ -3,7 +3,7 @@
   "displayName": "DW: VS Code",
   "description": "A personal extension, providing helpful functionality for my daily usage.",
   "publisher": "DWarsop",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "repository": "https://github.com/DWarsop/dw-vscode}",
   "icon": "icon.jpg",
   "engines": {
@@ -28,6 +28,11 @@
         "category": "DW: AL",
         "command": "dw-vs.al_createPermissionSet",
         "title": "Create Permission Set"
+      },
+      {
+        "category": "DW: AL",
+        "command": "dw-vs.al_insertAffix",
+        "title": "Insert Affix"
       }
     ]
   },

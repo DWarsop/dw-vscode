@@ -7,3 +7,7 @@
 ## 1.1.0
 
 - Added [DW: AL: Create Permission Set]
+
+## 1.2.0
+
+- Added [DW: AL: Insert Affix]

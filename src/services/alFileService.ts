@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { ALDevelopmentContext } from "../contexts/alDevelopmentContext";
 import { FileHelper } from "../helpers/fileHelper";
 import * as ALRESOURCES from "../constants/alResources";
+import * as ALCOMMANDS from "../constants/alCommands";
 
 interface LaunchConfigFile {
   schemaUpdateMode: string;
@@ -53,8 +54,47 @@ export class ALFileService {
       }),
       vscode.workspace.onDidChangeWorkspaceFolders(() => {
         this.setWithinALWorkspace();
+      }),
+      vscode.commands.registerCommand(ALCOMMANDS.insertAffix, () => {
+        this.runInsertAffix();
       })
     );
+  }
+
+  async runInsertAffix() {
+    if (!this.withinALWorkspace()) {
+      return;
+    }
+
+    try {
+      let editor = vscode.window.activeTextEditor;
+
+      if (editor !== undefined) {
+        let selection = editor.selection;
+        let affixes = await this.getAffixes();
+        let selectedAffix: string | undefined = undefined;
+
+        if (affixes.length > 1) {
+          selectedAffix = await vscode.window.showQuickPick(affixes, {
+            canPickMany: false,
+            placeHolder: "Select the required affix",
+          });
+        } else {
+          selectedAffix = affixes[0];
+        }
+
+        if (selectedAffix !== undefined) {
+          editor.edit((editBuilder) => {
+            editBuilder.insert(selection.start, selectedAffix!);
+          });
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        this._context.alDisplayService.showConsole();
+        this._context.alDisplayService.displayErrorMessage(error.message);
+      }
+    }
   }
 
   withinALWorkspace(): boolean {
@@ -316,10 +356,10 @@ export class ALFileService {
                 break;
               case 2:
                 alFileDetail.fullName = value;
-                let affix = await this.getAffix();
+                let affixes = await this.getAffixes();
                 alFileDetail.name = value
-                  .replace(affix + " ", "")
-                  .replace(affix, "");
+                  .replace(affixes[0] + " ", "")
+                  .replace(affixes[0], "");
                 break;
               case 3:
                 alFileDetail.modifier = value;
@@ -338,14 +378,14 @@ export class ALFileService {
     return undefined;
   }
 
-  async getAffix(): Promise<string> {
+  async getAffixes(): Promise<string[]> {
     let appSourceCopConfig = await this.getAppSourceCopFileConfig();
 
     if (appSourceCopConfig !== undefined) {
-      return appSourceCopConfig.mandatoryAffixes[0];
+      return appSourceCopConfig.mandatoryAffixes;
     }
 
-    return "";
+    return [];
   }
 
   async getIdRanges(): Promise<AppConfigFileIdRanges[] | undefined> {
@@ -359,10 +399,10 @@ export class ALFileService {
   }
 
   async buildFileName(fileName: string): Promise<string> {
-    let affix = await this.getAffix();
+    let affixes = await this.getAffixes();
 
-    if (affix !== "") {
-      return `${affix} ${fileName}`;
+    if (affixes[0] !== "") {
+      return `${affixes[0]} ${fileName}`;
     } else {
       return `${fileName}`;
     }

@@ -18,7 +18,7 @@ export class ALExtensionService {
 
     //Commands
     this._context.vscodeExtensionContext.subscriptions.push(
-      vscode.commands.registerCommand(ALCOMMANDS.PUBLISH, () => {
+      vscode.commands.registerCommand(ALCOMMANDS.publish, () => {
         this.runALPublish();
       })
     );
@@ -99,8 +99,10 @@ export class ALExtensionService {
         this.alExtensionAPI[ALSERVICES.build].publishContainer();
       }
     } catch (error) {
-      this._context.alDisplayService.showConsole();
-      this._context.alDisplayService.writeConsoleMessage(error);
+      if (error instanceof Error) {
+        this._context.alDisplayService.showConsole();
+        this._context.alDisplayService.displayErrorMessage(error.message);
+      }
     }
   }
 }

@@ -20,7 +20,7 @@ export class ALPermissionService {
 
     //Commands
     this._context.vscodeExtensionContext.subscriptions.push(
-      vscode.commands.registerCommand(ALCOMMANDS.CREATEPERMISSIONSET, () => {
+      vscode.commands.registerCommand(ALCOMMANDS.createPermissionSet, () => {
         this.runCreatePermissionSet();
       })
     );
@@ -43,7 +43,7 @@ export class ALPermissionService {
     } catch (error) {
       if (error instanceof Error) {
         this._context.alDisplayService.showConsole();
-        this._context.alDisplayService.writeConsoleMessage(error.message);
+        this._context.alDisplayService.displayErrorMessage(error.message);
       }
     }
   }
