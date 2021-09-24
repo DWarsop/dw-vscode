@@ -3,7 +3,8 @@ import { ALDevelopmentContext } from "../contexts/alDevelopmentContext";
 import { FileHelper, TextHelper } from "../helpers";
 import * as ALCOMMANDS from "../constants/alCommands";
 import * as ALRESOURCES from "../constants/alResources";
-import { ObjectTypes } from "../constants/alResources";
+import * as ALPERMISSIONRESOURCES from "../constants/alPermissionResources";
+import { ALObjectTypes } from "../constants/alResources";
 import { ALFileDetail } from "./alFileService";
 
 export class ALPermissionService {
@@ -55,7 +56,7 @@ export class ALPermissionService {
     let permissionSetFolderUri =
       await this._context.alFileService.createFolderInALWorkspace(
         this._fileHelper.getFileNameFromFile(objectFolderUri),
-        ALRESOURCES.permissionSetsFolder
+        ALPERMISSIONRESOURCES.permissionSetsFolder
       );
 
     let content = this._context.alContentService.buildPermissionSetContent(
@@ -74,7 +75,7 @@ export class ALPermissionService {
 
   async getId(): Promise<number> {
     return await this._context.alFileService.getNextAvailableId(
-      ObjectTypes.permissionSet
+      ALObjectTypes.permissionSet
     );
   }
 
@@ -87,7 +88,7 @@ export class ALPermissionService {
     }
 
     return this._context.alFileService.buildFileName(
-      ALRESOURCES.defaultPermissionSetName
+      ALPERMISSIONRESOURCES.defaultPermissionSetName
     );
   }
 
@@ -97,7 +98,7 @@ export class ALPermissionService {
       return appConfig.name.substr(0, 20);
     }
 
-    return ALRESOURCES.defaultPermissionSetName;
+    return ALPERMISSIONRESOURCES.defaultPermissionSetName;
   }
 
   async getFileName(): Promise<string> {
@@ -106,13 +107,13 @@ export class ALPermissionService {
       let appName = this._textHelper.stripWhitespace(
         appConfig.name.substr(0, 20)
       );
-      return appName + "." + ALRESOURCES.permissionSetFileEnd;
+      return appName + "." + ALPERMISSIONRESOURCES.permissionSetFileEnd;
     }
 
     return (
-      ALRESOURCES.defaultPermissionSetFileName +
+      ALPERMISSIONRESOURCES.defaultPermissionSetFileName +
       "." +
-      ALRESOURCES.permissionSetFileEnd
+      ALPERMISSIONRESOURCES.permissionSetFileEnd
     );
   }
 
@@ -127,7 +128,7 @@ export class ALPermissionService {
         if (
           alFileDetail !== undefined &&
           alFileDetail.type !== undefined &&
-          new RegExp(ALRESOURCES.permissionObjectTypeRegEx).test(
+          new RegExp(ALPERMISSIONRESOURCES.permissionObjectTypeRegEx).test(
             alFileDetail.type
           )
         ) {
@@ -140,18 +141,18 @@ export class ALPermissionService {
 
     alFileDetails.forEach((alFile, i, arr) => {
       let readWriteObject = new RegExp(
-        ALRESOURCES.permissionReadWriteObjectTypeRegEx
+        ALPERMISSIONRESOURCES.permissionReadWriteObjectTypeRegEx
       ).test(alFile.type!);
 
       if (readWriteObject) {
-        permissionLines += `${alFile.type} ${alFile.fullName} = ${ALRESOURCES.permissionExecute}${ALRESOURCES.permissionNewLine}`;
-        permissionLines += `${ALRESOURCES.tabledataObjectType} ${alFile.fullName} = ${ALRESOURCES.permissionTable}`;
+        permissionLines += `${alFile.type} ${alFile.fullName} = ${ALPERMISSIONRESOURCES.permissionExecute}${ALPERMISSIONRESOURCES.permissionNewLine}`;
+        permissionLines += `${ALObjectTypes.tableData} ${alFile.fullName} = ${ALPERMISSIONRESOURCES.permissionTable}`;
       } else {
-        permissionLines += `${alFile.type} ${alFile.fullName} = ${ALRESOURCES.permissionExecute}`;
+        permissionLines += `${alFile.type} ${alFile.fullName} = ${ALPERMISSIONRESOURCES.permissionExecute}`;
       }
 
       if (arr.length - 1 !== i) {
-        permissionLines += ALRESOURCES.permissionNewLine;
+        permissionLines += ALPERMISSIONRESOURCES.permissionNewLine;
       } else {
         permissionLines += ALRESOURCES.codeLineEnd;
       }

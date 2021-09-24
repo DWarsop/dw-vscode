@@ -3,7 +3,7 @@
   "displayName": "DW: VS Code",
   "description": "A personal extension, providing helpful functionality for my daily usage.",
   "publisher": "DWarsop",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "repository": "https://github.com/DWarsop/dw-vscode}",
   "icon": "icon.jpg",
   "engines": {
@@ -21,8 +21,8 @@
     "commands": [
       {
         "category": "DW: AL",
-        "command": "dw-vs.al_publish",
-        "title": "Publish"
+        "command": "dw-vs.al_debugPublish",
+        "title": "Debug/Publish"
       },
       {
         "category": "DW: AL",

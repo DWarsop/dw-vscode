@@ -11,3 +11,7 @@
 ## 1.2.0
 
 - Added [DW: AL: Insert Affix]
+
+## 1.2.1
+
+- Ammended Publish action to allow selection between different debug/publishing types. Adjusted to [DW: AL: Debug/Publish]

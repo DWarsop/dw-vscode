@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { ALDevelopmentContext } from "../contexts/alDevelopmentContext";
 import { FileHelper } from "../helpers/fileHelper";
+import * as ALDISPLAYRESOURCES from "../constants/alDisplayResources";
 import * as ALRESOURCES from "../constants/alResources";
 import * as ALCOMMANDS from "../constants/alCommands";
 
@@ -24,7 +25,7 @@ interface AppSourceCopConfigFile {
 }
 
 export interface ALFileDetail {
-  type: ALRESOURCES.ObjectTypes | undefined;
+  type: ALRESOURCES.ALObjectTypes | undefined;
   priority: number;
   id: number;
   fullName: string;
@@ -106,7 +107,7 @@ export class ALFileService {
 
     if (!within) {
       this._context.alDisplayService.displayErrorMessage(
-        ALRESOURCES.missingWorkspaceErr
+        ALDISPLAYRESOURCES.missingWorkspaceErr
       );
     }
 
@@ -347,7 +348,7 @@ export class ALFileService {
             let value = alHeaderSections[i];
             switch (i) {
               case 0:
-                alFileDetail.type = <ALRESOURCES.ObjectTypes>value;
+                alFileDetail.type = <ALRESOURCES.ALObjectTypes>value;
                 alFileDetail.priority =
                   ALRESOURCES.objectTypeInformation[alFileDetail.type].priority;
                 break;
@@ -409,7 +410,7 @@ export class ALFileService {
   }
 
   async getNextAvailableId(
-    objectType: ALRESOURCES.ObjectTypes
+    objectType: ALRESOURCES.ALObjectTypes
   ): Promise<number> {
     let idRanges = await this.getIdRanges();
     let alFileDetails: ALFileDetail[] = [];

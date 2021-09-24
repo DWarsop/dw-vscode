@@ -4,9 +4,9 @@ A VS Code extension for my own usage to help my daily development.
 
 ## Features
 
-#### DW AL: Publish:
+#### DW AL: Debug/Publish:
 
-Performs validation against the launch files `schemaUpdateMode` to ensure data won't be lost without confirmation on publishing an extension. Following confirmation the standard `[AL: Publish]` routine is called.
+Performs validation against the launch files `schemaUpdateMode` to ensure data won't be lost without confirmation on publishing an extension. Following confirmation a dropdown of the available debug/publish types is provided. Following selection the associated routine is called.
 
 #### DW AL: Create Permission Set:
 

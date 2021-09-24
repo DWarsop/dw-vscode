@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { ALDevelopmentContext } from "../contexts/alDevelopmentContext";
 import * as ALSERVICES from "../constants/alExtensionServices";
+import * as ALDISPLAYRESOURCES from "../constants/alDisplayResources";
 import * as ALRESOURCES from "../constants/alResources";
 import * as ALCOMMANDS from "../constants/alCommands";
 
@@ -18,7 +19,7 @@ export class ALExtensionService {
 
     //Commands
     this._context.vscodeExtensionContext.subscriptions.push(
-      vscode.commands.registerCommand(ALCOMMANDS.publish, () => {
+      vscode.commands.registerCommand(ALCOMMANDS.debugPublish, () => {
         this.runALPublish();
       })
     );
@@ -76,16 +77,19 @@ export class ALExtensionService {
       if (displayWarning) {
         let response =
           await this._context.alDisplayService.displayWarningMessageWithItems(
-            ALRESOURCES.schemaUpdateMethodQst,
+            ALDISPLAYRESOURCES.schemaUpdateMethodQst,
             false,
-            [ALRESOURCES.continueAction, ALRESOURCES.configurationsAction]
+            [
+              ALDISPLAYRESOURCES.continueAction,
+              ALDISPLAYRESOURCES.configurationsAction,
+            ]
           );
 
         switch (response) {
-          case ALRESOURCES.continueAction: {
+          case ALDISPLAYRESOURCES.continueAction: {
             break;
           }
-          case ALRESOURCES.configurationsAction: {
+          case ALDISPLAYRESOURCES.configurationsAction: {
             this._context.alFileService.openLaunchFile();
             return;
           }
@@ -96,7 +100,51 @@ export class ALExtensionService {
       }
 
       if (this.alExtensionAPI !== undefined) {
-        this.alExtensionAPI[ALSERVICES.build].publishContainer();
+        enum PublishOptions {
+          debugOnly = "Debug only",
+          publishWithDebugging = "Publish with debugging",
+          publishWithoutDebugging = "Publish without debugging",
+        }
+
+        const publishOptions = [
+          {
+            label: PublishOptions.debugOnly,
+            detail: "Debug the client, without running the publishing routine",
+          },
+          {
+            label: PublishOptions.publishWithDebugging,
+            detail:
+              "Run the publishing routine, debugging the client afterwards",
+          },
+          {
+            label: PublishOptions.publishWithoutDebugging,
+            detail:
+              "Run the publishing routine, without debugging the client afterwards",
+          },
+        ];
+
+        let publishType = await vscode.window.showQuickPick(publishOptions, {
+          canPickMany: false,
+          placeHolder: "Select the desired method...",
+        });
+
+        if (publishType !== undefined) {
+          switch (publishType.label) {
+            case PublishOptions.debugOnly:
+              this.alExtensionAPI[ALSERVICES.build].startDebugging(
+                false,
+                false,
+                true
+              );
+              break;
+            case PublishOptions.publishWithDebugging:
+              this.alExtensionAPI[ALSERVICES.build].publishContainer();
+              break;
+            case PublishOptions.publishWithoutDebugging:
+              this.alExtensionAPI[ALSERVICES.build].publishContainer(true);
+              break;
+          }
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
