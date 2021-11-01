@@ -95,26 +95,18 @@ export class ALPermissionService {
   async getCaption(): Promise<string> {
     let appConfig = await this._context.alFileService.getAppFileConfig();
     if (appConfig !== undefined) {
-      return appConfig.name.substr(0, 20);
+      return appConfig.name;
     }
 
     return ALPERMISSIONRESOURCES.defaultPermissionSetName;
   }
 
   async getFileName(): Promise<string> {
-    let appConfig = await this._context.alFileService.getAppFileConfig();
-    if (appConfig !== undefined) {
-      let appName = this._textHelper.stripWhitespace(
-        appConfig.name.substr(0, 20)
-      );
-      return appName + "." + ALPERMISSIONRESOURCES.permissionSetFileEnd;
-    }
-
-    return (
-      ALPERMISSIONRESOURCES.defaultPermissionSetFileName +
-      "." +
-      ALPERMISSIONRESOURCES.permissionSetFileEnd
-    );
+    let objectName = await this.getName();
+    objectName = await this._context.alFileService.stripAffixes(objectName);
+    objectName = this._textHelper.stripWhitespace(objectName);
+    objectName = this._textHelper.toCamelCase(objectName);
+    return objectName + "." + ALPERMISSIONRESOURCES.permissionSetFileEnd;
   }
 
   async getPermissionLines(files: vscode.Uri[]): Promise<string> {

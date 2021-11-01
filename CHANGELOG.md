@@ -15,3 +15,7 @@
 ## 1.2.1
 
 - Ammended Publish action to allow selection between different debug/publishing types. Adjusted to [DW: AL: Debug/Publish]
+
+## 1.2.2
+
+- Resolved various issues around permission set generation

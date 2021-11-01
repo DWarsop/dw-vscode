@@ -358,9 +358,13 @@ export class ALFileService {
               case 2:
                 alFileDetail.fullName = value;
                 let affixes = await this.getAffixes();
-                alFileDetail.name = value
-                  .replace(affixes[0] + " ", "")
-                  .replace(affixes[0], "");
+                if (affixes) {
+                  affixes.forEach((affix) => {
+                    alFileDetail.name = value
+                      .replace(affix + " ", "")
+                      .replace(affix, "");
+                  });
+                }
                 break;
               case 3:
                 alFileDetail.modifier = value;
@@ -389,6 +393,19 @@ export class ALFileService {
     return [];
   }
 
+  async stripAffixes(name: string): Promise<string> {
+    let newName = name;
+
+    let affixes = await this.getAffixes();
+    if (affixes) {
+      affixes.forEach((affix) => {
+        newName = newName.replace(affix + " ", "").replace(affix, "");
+      });
+    }
+
+    return newName;
+  }
+
   async getIdRanges(): Promise<AppConfigFileIdRanges[] | undefined> {
     let appFileConfig = await this.getAppFileConfig();
 
@@ -402,8 +419,8 @@ export class ALFileService {
   async buildFileName(fileName: string): Promise<string> {
     let affixes = await this.getAffixes();
 
-    if (affixes[0] !== "") {
-      return `${affixes[0]} ${fileName}`;
+    if (affixes && affixes[0] !== undefined) {
+      return `${affixes[0]} ${fileName.substr(0, 19 - affixes[0].length)}`;
     } else {
       return `${fileName}`;
     }
