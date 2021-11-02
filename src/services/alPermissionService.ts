@@ -35,11 +35,14 @@ export class ALPermissionService {
       let workspaceFiles =
         await this._context.alFileService.getFilesFromALWorkspace(
           ALRESOURCES.alFileSearchPattern,
-          1000
+          10000
         );
 
       if (workspaceFiles.length > 0) {
-        this.createPermissionFile(workspaceFiles);
+        await this.createPermissionFile(workspaceFiles);
+        this._context.alDisplayService.displayInfoMessage(
+          ALPERMISSIONRESOURCES.permissionFileCreated
+        );
       }
     } catch (error) {
       if (error instanceof Error) {

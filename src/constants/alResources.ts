@@ -3,6 +3,7 @@ export const launchJsonPath = ".vscode/launch.json";
 export const appJsonName = "app.json";
 export const appSourceCopJsonName = "AppSourceCop.json";
 export const objectsFolder = "objects";
+export const alFileEnd = ".al";
 export const alFileExtensionPattern = "*.al";
 export const alFileSearchPattern = "**/*.al";
 export const recreateSchemaUpdateMode = "Recreate";
@@ -41,28 +42,35 @@ export enum ALObjectTypes {
 
 type ObjectTypeInfo = {
   priority: number;
+  shorthand: string;
 };
 
 export const objectTypeInformation: Record<ALObjectTypes, ObjectTypeInfo> = {
-  [ALObjectTypes.table]: { priority: 1 },
-  [ALObjectTypes.tableData]: { priority: 1 },
-  [ALObjectTypes.tableExtension]: { priority: 1 },
-  [ALObjectTypes.page]: { priority: 2 },
-  [ALObjectTypes.pageExtension]: { priority: 2 },
-  [ALObjectTypes.pageCustomization]: { priority: 2 },
-  [ALObjectTypes.codeunit]: { priority: 3 },
-  [ALObjectTypes.report]: { priority: 4 },
-  [ALObjectTypes.reportExtension]: { priority: 4 },
-  [ALObjectTypes.xmlport]: { priority: 5 },
-  [ALObjectTypes.query]: { priority: 6 },
-  [ALObjectTypes.enum]: { priority: 6 },
-  [ALObjectTypes.enumExtension]: { priority: 6 },
-  [ALObjectTypes.value]: { priority: 7 },
-  [ALObjectTypes.profile]: { priority: 8 },
-  [ALObjectTypes.controlAddin]: { priority: 9 },
-  [ALObjectTypes.interface]: { priority: 10 },
-  [ALObjectTypes.permissionSet]: { priority: 11 },
-  [ALObjectTypes.permissionSetExtension]: { priority: 11 },
-  [ALObjectTypes.entitlement]: { priority: 12 },
-  [ALObjectTypes.dotnet]: { priority: 13 },
+  [ALObjectTypes.table]: { priority: 1, shorthand: "table" },
+  [ALObjectTypes.tableData]: { priority: 1, shorthand: "tableData" },
+  [ALObjectTypes.tableExtension]: { priority: 1, shorthand: "tableExt" },
+  [ALObjectTypes.page]: { priority: 2, shorthand: "page" },
+  [ALObjectTypes.pageExtension]: { priority: 2, shorthand: "pageExt" },
+  [ALObjectTypes.pageCustomization]: {
+    priority: 2,
+    shorthand: "pageCustomization",
+  },
+  [ALObjectTypes.codeunit]: { priority: 3, shorthand: "codeunit" },
+  [ALObjectTypes.report]: { priority: 4, shorthand: "report" },
+  [ALObjectTypes.reportExtension]: { priority: 4, shorthand: "reportExt" },
+  [ALObjectTypes.xmlport]: { priority: 5, shorthand: "xmlport" },
+  [ALObjectTypes.query]: { priority: 6, shorthand: "query" },
+  [ALObjectTypes.enum]: { priority: 6, shorthand: "enum" },
+  [ALObjectTypes.enumExtension]: { priority: 6, shorthand: "enumExt" },
+  [ALObjectTypes.value]: { priority: 7, shorthand: "value" },
+  [ALObjectTypes.profile]: { priority: 8, shorthand: "profile" },
+  [ALObjectTypes.controlAddin]: { priority: 9, shorthand: "controlAddIn" },
+  [ALObjectTypes.interface]: { priority: 10, shorthand: "interface" },
+  [ALObjectTypes.permissionSet]: { priority: 11, shorthand: "permissionSet" },
+  [ALObjectTypes.permissionSetExtension]: {
+    priority: 11,
+    shorthand: "permissionSetExt",
+  },
+  [ALObjectTypes.entitlement]: { priority: 12, shorthand: "entitlement" },
+  [ALObjectTypes.dotnet]: { priority: 13, shorthand: "dotnet" },
 };

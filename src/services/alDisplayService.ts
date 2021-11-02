@@ -5,7 +5,7 @@ export class ALDisplayService {
   //Class globals
   protected _context: ALDevelopmentContext;
   protected _outputChannel: vscode.OutputChannel | undefined;
-  private messagePrefix = "DW: ";
+  private messagePrefix = "DW AL: ";
 
   constructor(context: ALDevelopmentContext) {
     //Context globals

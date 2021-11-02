@@ -15,3 +15,7 @@ Creates a permissionset object with all the suitable workspace AL objects presen
 #### DW AL: Insert Affix:
 
 Inserts the affix from the AppSourceCop file to the cursor selection. If more than one exists a dropdown is provided to select the correct one.
+
+#### DW AL: Rename Files:
+
+Renames all suitable workspace AL files present to match the AL Language naming requirements.

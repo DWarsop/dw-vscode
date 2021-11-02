@@ -19,3 +19,9 @@
 ## 1.2.2
 
 - Resolved various issues around permission set generation
+
+## 1.3.0
+
+- Added [DW: AL: Rename Files]
+- Added information messages after completion of creating permission set
+- Resolved multiple affixes not being removed correctly

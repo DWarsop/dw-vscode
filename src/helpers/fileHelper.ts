@@ -111,6 +111,11 @@ export class FileHelper {
     }
   }
 
+  getFilePathFromFile(fileUri: vscode.Uri): string {
+    let filePath = fileUri.path;
+    return filePath.substring(0, filePath.lastIndexOf("/"));
+  }
+
   getFileNameFromFile(fileUri: vscode.Uri): string {
     let filePath = fileUri.path;
     return filePath.substring(filePath.lastIndexOf("/") + 1);

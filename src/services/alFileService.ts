@@ -4,6 +4,7 @@ import { FileHelper } from "../helpers/fileHelper";
 import * as ALDISPLAYRESOURCES from "../constants/alDisplayResources";
 import * as ALRESOURCES from "../constants/alResources";
 import * as ALCOMMANDS from "../constants/alCommands";
+import { TextHelper } from "../helpers";
 
 interface LaunchConfigFile {
   schemaUpdateMode: string;
@@ -27,6 +28,7 @@ interface AppSourceCopConfigFile {
 export interface ALFileDetail {
   type: ALRESOURCES.ALObjectTypes | undefined;
   priority: number;
+  shorthand: string;
   id: number;
   fullName: string;
   name: string;
@@ -39,12 +41,14 @@ export class ALFileService {
   protected _context: ALDevelopmentContext;
   protected _aLWorkspace?: string;
   protected _fileHelper: FileHelper;
+  protected _textHelper: TextHelper;
 
   constructor(context: ALDevelopmentContext) {
     //Context globals
     this._context = context;
     this._aLWorkspace = undefined;
     this._fileHelper = new FileHelper();
+    this._textHelper = new TextHelper();
 
     //Call on construction
     this.setWithinALWorkspace();
@@ -58,6 +62,9 @@ export class ALFileService {
       }),
       vscode.commands.registerCommand(ALCOMMANDS.insertAffix, () => {
         this.runInsertAffix();
+      }),
+      vscode.commands.registerCommand(ALCOMMANDS.renameFiles, () => {
+        this.runRenameFiles();
       })
     );
   }
@@ -90,6 +97,57 @@ export class ALFileService {
           });
         }
       }
+    } catch (error) {
+      if (error instanceof Error) {
+        this._context.alDisplayService.showConsole();
+        this._context.alDisplayService.displayErrorMessage(error.message);
+      }
+    }
+  }
+
+  async runRenameFiles() {
+    if (!this.withinALWorkspace()) {
+      return;
+    }
+
+    try {
+      let filesUpdated = 0;
+      let workspaceFiles =
+        await this._context.alFileService.getFilesFromALWorkspace(
+          ALRESOURCES.alFileSearchPattern,
+          10000
+        );
+
+      if (workspaceFiles.length > 0) {
+        await Promise.all(
+          workspaceFiles.map(async (file, i, arr) => {
+            let alFileDetail =
+              await this._context.alFileService.getALDetailsFromFile(file);
+            if (alFileDetail !== undefined && alFileDetail.type) {
+              let filePath = this._fileHelper.getFilePathFromFile(file);
+
+              let newFileName = this._textHelper.stripInvalidChars(
+                alFileDetail.name
+              );
+              newFileName = this._textHelper.toCamelCase(newFileName);
+              newFileName = this._textHelper.stripWhitespace(newFileName);
+              newFileName += `.${alFileDetail.shorthand}${ALRESOURCES.alFileEnd}`;
+
+              let newFileUri = this._fileHelper.getFilePath(
+                newFileName,
+                filePath
+              );
+
+              vscode.workspace.fs.rename(file, newFileUri);
+              filesUpdated += 1;
+            }
+          })
+        );
+      }
+
+      this._context.alDisplayService.displayInfoMessage(
+        `${filesUpdated} ${ALDISPLAYRESOURCES.filesRenamed}`
+      );
     } catch (error) {
       if (error instanceof Error) {
         this._context.alDisplayService.showConsole();
@@ -318,6 +376,7 @@ export class ALFileService {
   ): Promise<ALFileDetail | undefined> {
     let alFileDetail: ALFileDetail = {
       priority: 0,
+      shorthand: "",
       type: undefined,
       id: 0,
       fullName: "",
@@ -351,16 +410,22 @@ export class ALFileService {
                 alFileDetail.type = <ALRESOURCES.ALObjectTypes>value;
                 alFileDetail.priority =
                   ALRESOURCES.objectTypeInformation[alFileDetail.type].priority;
+                alFileDetail.shorthand =
+                  ALRESOURCES.objectTypeInformation[
+                    alFileDetail.type
+                  ].shorthand;
                 break;
               case 1:
                 alFileDetail.id = parseInt(value);
                 break;
               case 2:
                 alFileDetail.fullName = value;
+                alFileDetail.name = value;
+
                 let affixes = await this.getAffixes();
                 if (affixes) {
                   affixes.forEach((affix) => {
-                    alFileDetail.name = value
+                    alFileDetail.name = alFileDetail.name
                       .replace(affix + " ", "")
                       .replace(affix, "");
                   });
@@ -435,7 +500,7 @@ export class ALFileService {
     let workspaceFiles =
       await this._context.alFileService.getFilesFromALWorkspace(
         ALRESOURCES.alFileSearchPattern,
-        1000
+        10000
       );
 
     if (workspaceFiles.length > 0) {
