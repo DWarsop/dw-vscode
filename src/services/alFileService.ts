@@ -403,6 +403,11 @@ export class ALFileService {
           new RegExp(ALRESOURCES.wordQuoteBoundaryRegEx)
         );
         if (alHeaderSections !== null) {
+          //* Normal files have 3+ sections. Some however; such as Interfaces, don't use Ids so we adjust the array to re-align the parameters
+          if (alHeaderSections.length < 3) {
+            alHeaderSections.push(alHeaderSections[1]);
+          }
+
           for (let i = 0; i < alHeaderSections.length; i++) {
             let value = alHeaderSections[i];
             switch (i) {

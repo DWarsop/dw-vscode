@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.3.1
+
+- Resolved issue with interface files being incorrectly named during the rename file process
+
 ## 1.3.0
 
 - Added [DW: AL: Rename Files]
