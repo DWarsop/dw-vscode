@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.3.2
+
+- Resolved issue with workspace not changing when switching files impacting commands
+
 ## 1.3.1
 
 - Resolved issue with interface files being incorrectly named during the rename file process

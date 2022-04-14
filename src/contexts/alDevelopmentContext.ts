@@ -1,5 +1,3 @@
-"use strict";
-
 import * as vscode from "vscode";
 import { ALDisplayService } from "../services/alDisplayService";
 import { ALExtensionService } from "../services/alExtensionService";

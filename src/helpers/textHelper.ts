@@ -1,5 +1,3 @@
-import * as vscode from "vscode";
-
 export class TextHelper {
   stripWhitespace(value: string): string {
     return value.replace(/(\s)/, "");

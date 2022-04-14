@@ -6,9 +6,7 @@ export class FileHelper {
     var path = undefined;
 
     if (vscode.window.activeTextEditor) {
-      path = vscode.workspace.getWorkspaceFolder(
-        vscode.window.activeTextEditor.document.uri
-      );
+      path = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
     }
 
     return path;
@@ -18,28 +16,15 @@ export class FileHelper {
     return vscode.Uri.file(path.join(rootPath, filename));
   }
 
-  async getTextDocumentFromFilePath(
-    fileUri: vscode.Uri
-  ): Promise<vscode.TextDocument | undefined> {
+  async getTextDocumentFromFilePath(fileUri: vscode.Uri): Promise<vscode.TextDocument | undefined> {
     return vscode.workspace.openTextDocument(fileUri);
   }
 
-  async getFilesFromWorkspace(
-    includePattern: vscode.RelativePattern,
-    maxResults: number
-  ): Promise<vscode.Uri[]> {
-    return await vscode.workspace.findFiles(
-      includePattern,
-      undefined,
-      maxResults
-    );
+  async getFilesFromWorkspace(includePattern: vscode.RelativePattern, maxResults: number): Promise<vscode.Uri[]> {
+    return await vscode.workspace.findFiles(includePattern, undefined, maxResults);
   }
 
-  async createFile(
-    fileUri: vscode.Uri,
-    fileName: string,
-    content: Uint8Array = Buffer.from("")
-  ): Promise<vscode.Uri> {
+  async createFile(fileUri: vscode.Uri, fileName: string, content: Uint8Array = Buffer.from("")): Promise<vscode.Uri> {
     let creationFileUri = vscode.Uri.joinPath(fileUri, fileName);
 
     if (!(await this.uriExists(creationFileUri))) {
@@ -61,10 +46,7 @@ export class FileHelper {
     return creationFileUri;
   }
 
-  async createFolder(
-    fileUri: vscode.Uri,
-    folderName: string
-  ): Promise<vscode.Uri> {
+  async createFolder(fileUri: vscode.Uri, folderName: string): Promise<vscode.Uri> {
     let creationFileUri = vscode.Uri.joinPath(fileUri, folderName);
 
     if (!this.uriExists(creationFileUri)) {

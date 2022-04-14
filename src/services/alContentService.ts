@@ -9,12 +9,7 @@ export class ALContentService {
     this._context = context;
   }
 
-  buildPermissionSetContent(
-    id: number,
-    name: string,
-    caption: string,
-    permissions: string
-  ): string {
+  buildPermissionSetContent(id: number, name: string, caption: string, permissions: string): string {
     return `permissionset ${id} "${name}"
 {
     Caption = '${caption}';

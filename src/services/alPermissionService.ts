@@ -32,17 +32,14 @@ export class ALPermissionService {
       return;
     }
     try {
-      let workspaceFiles =
-        await this._context.alFileService.getFilesFromALWorkspace(
-          ALRESOURCES.alFileSearchPattern,
-          10000
-        );
+      let workspaceFiles = await this._context.alFileService.getFilesFromALWorkspace(
+        ALRESOURCES.alFileSearchPattern,
+        10000
+      );
 
       if (workspaceFiles.length > 0) {
         await this.createPermissionFile(workspaceFiles);
-        this._context.alDisplayService.displayInfoMessage(
-          ALPERMISSIONRESOURCES.permissionFileCreated
-        );
+        this._context.alDisplayService.displayInfoMessage(ALPERMISSIONRESOURCES.permissionFileCreated);
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -53,14 +50,12 @@ export class ALPermissionService {
   }
 
   async createPermissionFile(files: vscode.Uri[]) {
-    let objectFolderUri =
-      await this._context.alFileService.createObjectsFolderInALWorkspace();
+    let objectFolderUri = await this._context.alFileService.createObjectsFolderInALWorkspace();
 
-    let permissionSetFolderUri =
-      await this._context.alFileService.createFolderInALWorkspace(
-        this._fileHelper.getFileNameFromFile(objectFolderUri),
-        ALPERMISSIONRESOURCES.permissionSetsFolder
-      );
+    let permissionSetFolderUri = await this._context.alFileService.createFolderInALWorkspace(
+      this._fileHelper.getFileNameFromFile(objectFolderUri),
+      ALPERMISSIONRESOURCES.permissionSetsFolder
+    );
 
     let content = this._context.alContentService.buildPermissionSetContent(
       await this.getId(),
@@ -69,30 +64,20 @@ export class ALPermissionService {
       await this.getPermissionLines(files)
     );
 
-    await this._fileHelper.createUpdateFile(
-      permissionSetFolderUri,
-      await this.getFileName(),
-      Buffer.from(content)
-    );
+    await this._fileHelper.createUpdateFile(permissionSetFolderUri, await this.getFileName(), Buffer.from(content));
   }
 
   async getId(): Promise<number> {
-    return await this._context.alFileService.getNextAvailableId(
-      ALObjectTypes.permissionSet
-    );
+    return await this._context.alFileService.getNextAvailableId(ALObjectTypes.permissionSet);
   }
 
   async getName(): Promise<string> {
     let appConfig = await this._context.alFileService.getAppFileConfig();
     if (appConfig !== undefined) {
-      return this._context.alFileService.buildFileName(
-        appConfig.name.substr(0, 20)
-      );
+      return this._context.alFileService.buildFileName(appConfig.name.substr(0, 20));
     }
 
-    return this._context.alFileService.buildFileName(
-      ALPERMISSIONRESOURCES.defaultPermissionSetName
-    );
+    return this._context.alFileService.buildFileName(ALPERMISSIONRESOURCES.defaultPermissionSetName);
   }
 
   async getCaption(): Promise<string> {
@@ -118,14 +103,11 @@ export class ALPermissionService {
 
     await Promise.all(
       files.map(async (file, i, arr) => {
-        let alFileDetail =
-          await this._context.alFileService.getALDetailsFromFile(file);
+        let alFileDetail = await this._context.alFileService.getALDetailsFromFile(file);
         if (
           alFileDetail !== undefined &&
           alFileDetail.type !== undefined &&
-          new RegExp(ALPERMISSIONRESOURCES.permissionObjectTypeRegEx).test(
-            alFileDetail.type
-          )
+          new RegExp(ALPERMISSIONRESOURCES.permissionObjectTypeRegEx).test(alFileDetail.type)
         ) {
           alFileDetails.push(alFileDetail);
         }
@@ -135,9 +117,7 @@ export class ALPermissionService {
     alFileDetails.sort((a, b) => (a.priority < b.priority ? -1 : 1));
 
     alFileDetails.forEach((alFile, i, arr) => {
-      let readWriteObject = new RegExp(
-        ALPERMISSIONRESOURCES.permissionReadWriteObjectTypeRegEx
-      ).test(alFile.type!);
+      let readWriteObject = new RegExp(ALPERMISSIONRESOURCES.permissionReadWriteObjectTypeRegEx).test(alFile.type!);
 
       if (readWriteObject) {
         permissionLines += `${alFile.type} ${alFile.fullName} = ${ALPERMISSIONRESOURCES.permissionExecute}${ALPERMISSIONRESOURCES.permissionNewLine}`;

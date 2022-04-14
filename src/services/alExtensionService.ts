@@ -29,9 +29,7 @@ export class ALExtensionService {
     let alExtension = vscode.extensions.getExtension(ALRESOURCES.alExtensionId);
 
     if (!alExtension) {
-      this._context.alDisplayService.writeConsoleMessage(
-        "AL extension could not be found!"
-      );
+      this._context.alDisplayService.writeConsoleMessage("AL extension could not be found!");
       return;
     }
 
@@ -41,8 +39,7 @@ export class ALExtensionService {
 
   retrieveLastActiveWorkspacePath(): string | undefined {
     if (this.alExtensionAPI !== undefined) {
-      let lastActiveWorkspacePath =
-        this.alExtensionAPI[ALSERVICES.editor].lastActiveWorkspacePath;
+      let lastActiveWorkspacePath = this.alExtensionAPI[ALSERVICES.editor].lastActiveWorkspacePath;
 
       //Performing null check due to AL extension not returning undefined
       if (lastActiveWorkspacePath !== null) {
@@ -61,29 +58,22 @@ export class ALExtensionService {
     try {
       let displayWarning: boolean = false;
 
-      let launchFileConfigs =
-        await this._context.alFileService.getLaunchFileConfigs();
+      let launchFileConfigs = await this._context.alFileService.getLaunchFileConfigs();
 
       if (launchFileConfigs !== undefined) {
         launchFileConfigs.forEach((config) => {
-          if (
-            config.schemaUpdateMode === ALRESOURCES.recreateSchemaUpdateMode
-          ) {
+          if (config.schemaUpdateMode === ALRESOURCES.recreateSchemaUpdateMode) {
             displayWarning = true;
           }
         });
       }
 
       if (displayWarning) {
-        let response =
-          await this._context.alDisplayService.displayWarningMessageWithItems(
-            ALDISPLAYRESOURCES.schemaUpdateMethodQst,
-            false,
-            [
-              ALDISPLAYRESOURCES.continueAction,
-              ALDISPLAYRESOURCES.configurationsAction,
-            ]
-          );
+        let response = await this._context.alDisplayService.displayWarningMessageWithItems(
+          ALDISPLAYRESOURCES.schemaUpdateMethodQst,
+          false,
+          [ALDISPLAYRESOURCES.continueAction, ALDISPLAYRESOURCES.configurationsAction]
+        );
 
         switch (response) {
           case ALDISPLAYRESOURCES.continueAction: {
@@ -113,13 +103,11 @@ export class ALExtensionService {
           },
           {
             label: PublishOptions.publishWithDebugging,
-            detail:
-              "Run the publishing routine, debugging the client afterwards",
+            detail: "Run the publishing routine, debugging the client afterwards",
           },
           {
             label: PublishOptions.publishWithoutDebugging,
-            detail:
-              "Run the publishing routine, without debugging the client afterwards",
+            detail: "Run the publishing routine, without debugging the client afterwards",
           },
         ];
 
@@ -131,11 +119,7 @@ export class ALExtensionService {
         if (publishType !== undefined) {
           switch (publishType.label) {
             case PublishOptions.debugOnly:
-              this.alExtensionAPI[ALSERVICES.build].startDebugging(
-                false,
-                false,
-                true
-              );
+              this.alExtensionAPI[ALSERVICES.build].startDebugging(false, false, true);
               break;
             case PublishOptions.publishWithDebugging:
               this.alExtensionAPI[ALSERVICES.build].publishContainer();

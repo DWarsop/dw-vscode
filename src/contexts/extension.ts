@@ -3,9 +3,7 @@ import { ALDevelopmentContext } from "./alDevelopmentContext";
 
 export function activate(context: vscode.ExtensionContext) {
   //Initialise contexts
-  const alDevelopmentContext: ALDevelopmentContext = new ALDevelopmentContext(
-    context
-  );
+  const alDevelopmentContext: ALDevelopmentContext = new ALDevelopmentContext(context);
   context.subscriptions.push(alDevelopmentContext);
 }
 

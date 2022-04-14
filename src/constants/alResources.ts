@@ -7,7 +7,6 @@ export const alFileEnd = ".al";
 export const alFileExtensionPattern = "*.al";
 export const alFileSearchPattern = "**/*.al";
 export const recreateSchemaUpdateMode = "Recreate";
-
 export const objectTypeRegEx =
   /\b(CODEUNIT|PAGE|PAGEEXTENSION|PAGECUSTOMIZATION|DOTNET|ENUM|ENUMEXTENSION|VALUE|QUERY|REPORT|TABLE|TABLEEXTENSION|XMLPORT|PROFILE|CONTROLADDIN|REPORTEXTENSION|INTERFACE|PERMISSIONSET|PERMISSIONSETEXTENSION|ENTITLEMENT)/i;
 export const codeLineEnd = ";";

@@ -19,16 +19,8 @@ export class ALDisplayService {
     vscode.window.showInformationMessage(this.messagePrefix + message);
   }
 
-  displayInfoMessageWithItems(
-    message: string,
-    modal: boolean,
-    items: string[]
-  ): Thenable<string | undefined> {
-    let selected = vscode.window.showInformationMessage(
-      this.messagePrefix + message,
-      { modal: modal },
-      ...items
-    );
+  displayInfoMessageWithItems(message: string, modal: boolean, items: string[]): Thenable<string | undefined> {
+    let selected = vscode.window.showInformationMessage(this.messagePrefix + message, { modal: modal }, ...items);
 
     return selected;
   }
@@ -37,16 +29,8 @@ export class ALDisplayService {
     vscode.window.showWarningMessage(this.messagePrefix + message);
   }
 
-  displayWarningMessageWithItems(
-    message: string,
-    modal: boolean,
-    items: string[]
-  ): Thenable<string | undefined> {
-    let selected = vscode.window.showWarningMessage(
-      this.messagePrefix + message,
-      { modal: modal },
-      ...items
-    );
+  displayWarningMessageWithItems(message: string, modal: boolean, items: string[]): Thenable<string | undefined> {
+    let selected = vscode.window.showWarningMessage(this.messagePrefix + message, { modal: modal }, ...items);
 
     return selected;
   }
@@ -55,16 +39,8 @@ export class ALDisplayService {
     vscode.window.showErrorMessage(this.messagePrefix + message);
   }
 
-  displayErrorMessageWithItems(
-    message: string,
-    modal: boolean,
-    items: string[]
-  ): Thenable<string | undefined> {
-    let selected = vscode.window.showErrorMessage(
-      this.messagePrefix + message,
-      { modal: modal },
-      ...items
-    );
+  displayErrorMessageWithItems(message: string, modal: boolean, items: string[]): Thenable<string | undefined> {
+    let selected = vscode.window.showErrorMessage(this.messagePrefix + message, { modal: modal }, ...items);
 
     return selected;
   }
