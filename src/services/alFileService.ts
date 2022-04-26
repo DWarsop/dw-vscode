@@ -5,6 +5,7 @@ import * as ALDISPLAYRESOURCES from "../constants/alDisplayResources";
 import * as ALRESOURCES from "../constants/alResources";
 import * as ALCOMMANDS from "../constants/alCommands";
 import { TextHelper } from "../helpers";
+import { DevelopmentContext } from "../contexts/developmentContext";
 
 interface LaunchConfigFile {
   schemaUpdateMode: string;
@@ -38,14 +39,16 @@ export interface ALFileDetail {
 
 export class ALFileService {
   //Class globals
-  protected _context: ALDevelopmentContext;
+  protected _alContext: ALDevelopmentContext;
+  protected _devContext: DevelopmentContext;
   protected _aLWorkspace?: string;
   protected _fileHelper: FileHelper;
   protected _textHelper: TextHelper;
 
-  constructor(context: ALDevelopmentContext) {
+  constructor(devContext: DevelopmentContext, alContext: ALDevelopmentContext) {
     //Context globals
-    this._context = context;
+    this._alContext = alContext;
+    this._devContext = devContext;
     this._aLWorkspace = undefined;
     this._fileHelper = new FileHelper();
     this._textHelper = new TextHelper();
@@ -53,7 +56,7 @@ export class ALFileService {
     //Call on construction
     this.setWithinALWorkspace();
 
-    this._context.vscodeExtensionContext.subscriptions.push(
+    this._alContext.vscodeExtensionContext.subscriptions.push(
       vscode.window.onDidChangeActiveTextEditor(() => {
         this.setWithinALWorkspace();
       }),
@@ -99,8 +102,8 @@ export class ALFileService {
       }
     } catch (error) {
       if (error instanceof Error) {
-        this._context.alDisplayService.showConsole();
-        this._context.alDisplayService.displayErrorMessage(error.message);
+        this._devContext.displayService.showConsole();
+        this._devContext.displayService.displayErrorMessage(error.message);
       }
     }
   }
@@ -112,7 +115,7 @@ export class ALFileService {
 
     try {
       let filesUpdated = 0;
-      let workspaceFiles = await this._context.alFileService.getFilesFromALWorkspace(
+      let workspaceFiles = await this._alContext.alFileService.getFilesFromALWorkspace(
         ALRESOURCES.alFileSearchPattern,
         10000
       );
@@ -120,7 +123,7 @@ export class ALFileService {
       if (workspaceFiles.length > 0) {
         await Promise.all(
           workspaceFiles.map(async (file, i, arr) => {
-            let alFileDetail = await this._context.alFileService.getALDetailsFromFile(file);
+            let alFileDetail = await this._alContext.alFileService.getALDetailsFromFile(file);
             if (alFileDetail !== undefined && alFileDetail.type) {
               let filePath = this._fileHelper.getFilePathFromFile(file);
 
@@ -138,11 +141,11 @@ export class ALFileService {
         );
       }
 
-      this._context.alDisplayService.displayInfoMessage(`${filesUpdated} ${ALDISPLAYRESOURCES.filesRenamed}`);
+      this._devContext.displayService.displayInfoMessage(`${filesUpdated} ${ALDISPLAYRESOURCES.filesRenamed}`);
     } catch (error) {
       if (error instanceof Error) {
-        this._context.alDisplayService.showConsole();
-        this._context.alDisplayService.displayErrorMessage(error.message);
+        this._devContext.displayService.showConsole();
+        this._devContext.displayService.displayErrorMessage(error.message);
       }
     }
   }
@@ -153,14 +156,14 @@ export class ALFileService {
     let within = this._aLWorkspace !== undefined;
 
     if (!within) {
-      this._context.alDisplayService.displayErrorMessage(ALDISPLAYRESOURCES.missingWorkspaceErr);
+      this._devContext.displayService.displayErrorMessage(ALDISPLAYRESOURCES.missingWorkspaceErr);
     }
 
     return within;
   }
 
   setWithinALWorkspace() {
-    let workspacePath = this._context.alExtensionService.retrieveLastActiveWorkspacePath();
+    let workspacePath = this._alContext.alExtensionService.retrieveLastActiveWorkspacePath();
 
     if (workspacePath === this._aLWorkspace) {
       return;
@@ -424,7 +427,7 @@ export class ALFileService {
     let idRanges = await this.getIdRanges();
     let alFileDetails: ALFileDetail[] = [];
 
-    let workspaceFiles = await this._context.alFileService.getFilesFromALWorkspace(
+    let workspaceFiles = await this._alContext.alFileService.getFilesFromALWorkspace(
       ALRESOURCES.alFileSearchPattern,
       10000
     );
@@ -432,7 +435,7 @@ export class ALFileService {
     if (workspaceFiles.length > 0) {
       await Promise.all(
         workspaceFiles.map(async (file, i, arr) => {
-          let alFileDetail = await this._context.alFileService.getALDetailsFromFile(file);
+          let alFileDetail = await this._alContext.alFileService.getALDetailsFromFile(file);
           if (alFileDetail !== undefined && alFileDetail.type === objectType) {
             alFileDetails.push(alFileDetail);
           }

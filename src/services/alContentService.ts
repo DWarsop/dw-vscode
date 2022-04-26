@@ -1,12 +1,15 @@
 import { ALDevelopmentContext } from "../contexts/alDevelopmentContext";
+import { DevelopmentContext } from "../contexts/developmentContext";
 
 export class ALContentService {
   //Class globals
-  protected _context: ALDevelopmentContext;
+  protected _alContext: ALDevelopmentContext;
+  protected _devContext: DevelopmentContext;
 
-  constructor(context: ALDevelopmentContext) {
+  constructor(devContext: DevelopmentContext, alContext: ALDevelopmentContext) {
     //Context globals
-    this._context = context;
+    this._alContext = alContext;
+    this._devContext = devContext;
   }
 
   buildPermissionSetContent(id: number, name: string, caption: string, permissions: string): string {

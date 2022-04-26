@@ -4,21 +4,24 @@ import * as ALSERVICES from "../constants/alExtensionServices";
 import * as ALDISPLAYRESOURCES from "../constants/alDisplayResources";
 import * as ALRESOURCES from "../constants/alResources";
 import * as ALCOMMANDS from "../constants/alCommands";
+import { DevelopmentContext } from "../contexts/developmentContext";
 
 export class ALExtensionService {
   //Class globals
-  protected _context: ALDevelopmentContext;
+  protected _alContext: ALDevelopmentContext;
+  protected _devContext: DevelopmentContext;
   protected alExtensionAPI: any;
 
-  constructor(context: ALDevelopmentContext) {
+  constructor(devContext: DevelopmentContext, alContext: ALDevelopmentContext) {
     //Context globals
-    this._context = context;
+    this._alContext = alContext;
+    this._devContext = devContext;
 
     //Retrieve extension
     this.retrieveALExtensionAPI();
 
     //Commands
-    this._context.vscodeExtensionContext.subscriptions.push(
+    this._alContext.vscodeExtensionContext.subscriptions.push(
       vscode.commands.registerCommand(ALCOMMANDS.debugPublish, () => {
         this.runALPublish();
       })
@@ -29,7 +32,7 @@ export class ALExtensionService {
     let alExtension = vscode.extensions.getExtension(ALRESOURCES.alExtensionId);
 
     if (!alExtension) {
-      this._context.alDisplayService.writeConsoleMessage("AL extension could not be found!");
+      this._devContext.displayService.writeConsoleMessage("AL extension could not be found!");
       return;
     }
 
@@ -51,14 +54,14 @@ export class ALExtensionService {
   }
 
   async runALPublish() {
-    if (!this._context.alFileService.withinALWorkspace()) {
+    if (!this._alContext.alFileService.withinALWorkspace()) {
       return;
     }
 
     try {
       let displayWarning: boolean = false;
 
-      let launchFileConfigs = await this._context.alFileService.getLaunchFileConfigs();
+      let launchFileConfigs = await this._alContext.alFileService.getLaunchFileConfigs();
 
       if (launchFileConfigs !== undefined) {
         launchFileConfigs.forEach((config) => {
@@ -69,7 +72,7 @@ export class ALExtensionService {
       }
 
       if (displayWarning) {
-        let response = await this._context.alDisplayService.displayWarningMessageWithItems(
+        let response = await this._devContext.displayService.displayWarningMessageWithItems(
           ALDISPLAYRESOURCES.schemaUpdateMethodQst,
           false,
           [ALDISPLAYRESOURCES.continueAction, ALDISPLAYRESOURCES.configurationsAction]
@@ -80,7 +83,7 @@ export class ALExtensionService {
             break;
           }
           case ALDISPLAYRESOURCES.configurationsAction: {
-            this._context.alFileService.openLaunchFile();
+            this._alContext.alFileService.openLaunchFile();
             return;
           }
           default: {
@@ -132,8 +135,8 @@ export class ALExtensionService {
       }
     } catch (error) {
       if (error instanceof Error) {
-        this._context.alDisplayService.showConsole();
-        this._context.alDisplayService.displayErrorMessage(error.message);
+        this._devContext.displayService.showConsole();
+        this._devContext.displayService.displayErrorMessage(error.message);
       }
     }
   }

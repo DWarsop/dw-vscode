@@ -1,18 +1,18 @@
 import * as vscode from "vscode";
-import { ALDevelopmentContext } from "../contexts/alDevelopmentContext";
+import { DevelopmentContext } from "../contexts/developmentContext";
 
-export class ALDisplayService {
+export class DisplayService {
   //Class globals
-  protected _context: ALDevelopmentContext;
+  protected _context: DevelopmentContext;
   protected _outputChannel: vscode.OutputChannel | undefined;
-  private messagePrefix = "DW AL: ";
+  private messagePrefix = "DW VS: ";
 
-  constructor(context: ALDevelopmentContext) {
+  constructor(context: DevelopmentContext) {
     //Context globals
     this._context = context;
 
     //Initialise UI
-    this._outputChannel = vscode.window.createOutputChannel("DW: AL");
+    this._outputChannel = vscode.window.createOutputChannel("DW VS");
   }
 
   displayInfoMessage(message: string) {
