@@ -3,7 +3,7 @@
   "displayName": "DW: VS Code",
   "description": "A personal extension, providing helpful functionality for my daily usage.",
   "publisher": "DWarsop",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "repository": "https://github.com/DWarsop/dw-vscode}",
   "icon": "icon.jpg",
   "engines": {
@@ -13,6 +13,9 @@
     "Other"
   ],
   "activationEvents": [
+    "onCommand:dw-vs.devops_authorize",
+    "onCommand:dw-vs.devops_clearAuthorization",
+    "onCommand:dw-vs.devops_cloneRepo",
     "workspaceContains:app.json",
     "onLanguage:al"
   ],
@@ -38,6 +41,21 @@
         "category": "DW: AL",
         "command": "dw-vs.al_renameFiles",
         "title": "Rename Files"
+      },
+      {
+        "category": "DW: DevOps",
+        "command": "dw-vs.devops_authorize",
+        "title": "Authorize"
+      },
+      {
+        "category": "DW: DevOps",
+        "command": "dw-vs.devops_clearAuthorization",
+        "title": "Clear Authorization"
+      },
+      {
+        "category": "DW: DevOps",
+        "command": "dw-vs.devops_cloneRepo",
+        "title": "Clone DevOps Respository"
       }
     ]
   },
@@ -50,19 +68,23 @@
     "test": "node ./out/test/runTest.js"
   },
   "extensionDependencies": [
-    "ms-dynamics-smb.al"
+    "ms-dynamics-smb.al",
+    "vscode.git"
   ],
   "devDependencies": {
-    "@types/vscode": "^1.52.0",
     "@types/glob": "^7.1.3",
     "@types/mocha": "^8.0.4",
     "@types/node": "^12.11.7",
-    "eslint": "^7.15.0",
+    "@types/vscode": "^1.52.0",
     "@typescript-eslint/eslint-plugin": "^4.9.0",
     "@typescript-eslint/parser": "^4.9.0",
+    "eslint": "^7.15.0",
     "glob": "^7.1.6",
     "mocha": "^8.1.3",
     "typescript": "^4.1.2",
     "vscode-test": "^1.4.1"
+  },
+  "dependencies": {
+    "axios": "^0.27.1"
   }
 }

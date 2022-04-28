@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.4.0
+
+- Added DevOps functionality - Authenticated via a PAT token currently, may look to move to OAuth for security at a later time
+- Added [DW: DevOps: Authorize]
+- Added [DW: DevOps: Clear Authorization]
+- Added [DW: DevOps: Clone DevOps Repository]
+
 ## 1.3.2
 
 - Resolved issue with workspace not changing when switching files impacting commands
