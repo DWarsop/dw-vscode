@@ -26,3 +26,6 @@ Removes any stored authorization details used to authenticate with DevOps.
 
 `DW DevOps: Clone DevOps Repository:`
 Provides a dropdown of all the accessible Git repositories against the authorized DevOps account. On selection the standard VSCode Git functionality takes over to clone the repository down to the local machine.
+
+`DW DevOps: Open DevOps Project:`
+Provides a dropdown of all the accessible projects against the authorized DevOps account. On selection the selected project url is navigated to via the systems web browser.

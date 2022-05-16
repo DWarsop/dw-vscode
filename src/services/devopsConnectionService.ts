@@ -28,6 +28,10 @@ export class DevOpsConnectionService {
 
       vscode.commands.registerCommand(DEVOPSCOMMANDS.cloneRepo, () => {
         this.cloneRepository();
+      }),
+
+      vscode.commands.registerCommand(DEVOPSCOMMANDS.openProject, () => {
+        this.openProjectInBrowser();
       })
     );
   }
@@ -64,7 +68,7 @@ export class DevOpsConnectionService {
       return false;
     }
 
-    const response = await this.getRepositoryListFromDevOps(baseUri, accessToken);
+    const response = await this.getRepositoryListFromDevOps(baseUri, accessToken, 1);
 
     if (response.status !== 200) {
       this._devContext.displayService.displayErrorMessage(DEVOPSDISPLAYRESOURCES.connectionFailed);
@@ -86,8 +90,28 @@ export class DevOpsConnectionService {
     this._devContext.displayService.displayInfoMessage(DEVOPSDISPLAYRESOURCES.authorizationCleared);
   }
 
-  async getRepositoryListFromDevOps(baseUri: string, accessToken: string): Promise<AxiosResponse> {
-    return axios.get(`${baseUri}/_apis/git/repositories`, {
+  async getRepositoryListFromDevOps(baseUri: string, accessToken: string, recordCount: number): Promise<AxiosResponse> {
+    return axios.get(`${baseUri}/_apis/git/repositories?$top=${recordCount}`, {
+      responseType: "json",
+      auth: {
+        username: "",
+        password: accessToken,
+      },
+    });
+  }
+
+  async getProjectListFromDevOps(baseUri: string, accessToken: string, recordCount: number): Promise<AxiosResponse> {
+    return axios.get(`${baseUri}/_apis/projects?$top=${recordCount}`, {
+      responseType: "json",
+      auth: {
+        username: "",
+        password: accessToken,
+      },
+    });
+  }
+
+  async getProjectFromDevOps(baseUri: string, accessToken: string, projectId: string): Promise<AxiosResponse> {
+    return axios.get(`${baseUri}/_apis/projects/${projectId}`, {
       responseType: "json",
       auth: {
         username: "",
@@ -112,7 +136,7 @@ export class DevOpsConnectionService {
           message: DEVOPSDISPLAYRESOURCES.retrievingRepositories,
         });
 
-        return this.getRepositoryListFromDevOps(baseUri!, accessToken!);
+        return this.getRepositoryListFromDevOps(baseUri!, accessToken!, 1000);
       }
     );
 
@@ -121,10 +145,12 @@ export class DevOpsConnectionService {
       return false;
     }
 
-    let repositories: Array<{ label: string; detail: string }> = [];
+    let repositories: Array<{ label: string; url: string }> = [];
     response.data.value.forEach((repo: any) => {
-      repositories = [...repositories, { label: repo.name, detail: repo.remoteUrl }];
+      repositories = [...repositories, { label: repo.name, url: repo.remoteUrl }];
     });
+
+    repositories.sort((a, b) => a.label.localeCompare(b.label));
 
     const selectedRepo = await vscode.window.showQuickPick(repositories, {
       canPickMany: false,
@@ -135,6 +161,74 @@ export class DevOpsConnectionService {
       return;
     }
 
-    this._devContext.gitExtensionService.cloneRepository(selectedRepo.detail);
+    this._devContext.gitExtensionService.cloneRepository(selectedRepo.url);
+  }
+
+  async openProjectInBrowser() {
+    let baseUri = this.retrieveStoredBaseUri();
+    let accessToken = this.retrieveStoredPAT();
+
+    if (!baseUri || !accessToken) {
+      this._devContext.displayService.displayErrorMessage(DEVOPSDISPLAYRESOURCES.missingDetails);
+      return;
+    }
+
+    const response = await vscode.window.withProgress(
+      { cancellable: true, location: vscode.ProgressLocation.Notification },
+      async (progress) => {
+        progress.report({
+          message: DEVOPSDISPLAYRESOURCES.retrievingProjects,
+        });
+
+        return this.getProjectListFromDevOps(baseUri!, accessToken!, 1000);
+      }
+    );
+
+    if (response.status !== 200) {
+      this._devContext.displayService.displayErrorMessage(DEVOPSDISPLAYRESOURCES.connectionFailed);
+      return false;
+    }
+
+    let projects: Array<{ label: string; id: string }> = [];
+    response.data.value.forEach((project: any) => {
+      projects = [...projects, { label: project.name, id: project.id }];
+    });
+
+    if (!projects) {
+      return;
+    }
+
+    projects.sort((a, b) => a.label.localeCompare(b.label));
+
+    const selectedProject = await vscode.window.showQuickPick(projects, {
+      canPickMany: false,
+      placeHolder: DEVOPSDISPLAYRESOURCES.selectProjectToOpen,
+    });
+
+    if (!selectedProject) {
+      return;
+    }
+
+    const projectResponse = await vscode.window.withProgress(
+      { cancellable: true, location: vscode.ProgressLocation.Notification },
+      async (progress) => {
+        progress.report({
+          message: DEVOPSDISPLAYRESOURCES.retrievingSelectedProject,
+        });
+
+        return this.getProjectFromDevOps(baseUri!, accessToken!, selectedProject.id);
+      }
+    );
+
+    if (
+      projectResponse.status !== 200 ||
+      !projectResponse.data._links.web.href ||
+      projectResponse.data._links.web.href === ""
+    ) {
+      this._devContext.displayService.displayErrorMessage(DEVOPSDISPLAYRESOURCES.connectionFailed);
+      return false;
+    }
+
+    vscode.env.openExternal(vscode.Uri.parse(projectResponse.data._links.web.href));
   }
 }

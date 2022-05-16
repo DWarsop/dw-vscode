@@ -3,7 +3,7 @@
   "displayName": "DW: VS Code",
   "description": "A personal extension, providing helpful functionality for my daily usage.",
   "publisher": "DWarsop",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "repository": "https://github.com/DWarsop/dw-vscode}",
   "icon": "icon.jpg",
   "engines": {
@@ -16,6 +16,7 @@
     "onCommand:dw-vs.devops_authorize",
     "onCommand:dw-vs.devops_clearAuthorization",
     "onCommand:dw-vs.devops_cloneRepo",
+    "onCommand:dw-vs.devops_openProject",
     "workspaceContains:app.json",
     "onLanguage:al"
   ],
@@ -55,7 +56,12 @@
       {
         "category": "DW: DevOps",
         "command": "dw-vs.devops_cloneRepo",
-        "title": "Clone DevOps Respository"
+        "title": "Clone DevOps Repository"
+      },
+      {
+        "category": "DW: DevOps",
+        "command": "dw-vs.devops_openProject",
+        "title": "Open DevOps Project"
       }
     ]
   },

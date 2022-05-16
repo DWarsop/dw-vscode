@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.5.0
+
+- Corrected typo in command title
+- Added [DW: DevOps: Open DevOps Project]
+
 ## 1.4.0
 
 - Added DevOps functionality - Authenticated via a PAT token currently, may look to move to OAuth for security at a later time

@@ -5,6 +5,9 @@ export const connectionFailed =
   "Connection to the DevOps API failed with the provided authentication. Has your PAT expired or been entered incorrectly?";
 export const missingDetails = "Please authorize your requests first using the [DevOps: Authorize] command.";
 export const retrievingRepositories = "Retrieving repositories...";
+export const retrievingProjects = "Retrieving projects...";
+export const retrievingSelectedProject = "Retrieving selected project...";
 export const selectRepoToClone = "Select a repository to clone...";
+export const selectProjectToOpen = "Select a project to open...";
 export const authorizationCleared = "Stored DevOps authorization has been cleared.";
 export const authorizationStored = "Authorization to DevOps has been validated and stored successfully.";
