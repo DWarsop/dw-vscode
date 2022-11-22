@@ -15,7 +15,7 @@ export class ALContentService {
   buildPermissionSetContent(id: number, name: string, caption: string, permissions: string): string {
     return `permissionset ${id} "${name}"
 {
-    Caption = '${caption}';
+    Caption = '${caption}', Locked = true;
     Assignable = true;
 
     Permissions =

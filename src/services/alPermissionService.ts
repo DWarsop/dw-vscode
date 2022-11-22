@@ -77,7 +77,7 @@ export class ALPermissionService {
   async getName(): Promise<string> {
     let appConfig = await this._alContext.alFileService.getAppFileConfig();
     if (appConfig !== undefined) {
-      return this._alContext.alFileService.buildFileName(appConfig.name.substr(0, 20));
+      return this._alContext.alFileService.buildFileName(appConfig.name.substring(0, 20));
     }
 
     return this._alContext.alFileService.buildFileName(ALPERMISSIONRESOURCES.defaultPermissionSetName);
@@ -86,7 +86,7 @@ export class ALPermissionService {
   async getCaption(): Promise<string> {
     let appConfig = await this._alContext.alFileService.getAppFileConfig();
     if (appConfig !== undefined) {
-      return appConfig.name;
+      return appConfig.name.substring(0, 30);
     }
 
     return ALPERMISSIONRESOURCES.defaultPermissionSetName;

@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.5.1
+
+- Resolved issue with permission set caption exceeding 30 characters
+- Added "locked" property to permission set caption
+- Adjusted permission set to use indirect RIMD
+- Repointed depreciated functions
+
 ## 1.5.0
 
 - Corrected typo in command title

@@ -417,7 +417,7 @@ export class ALFileService {
     let affixes = await this.getAffixes();
 
     if (affixes && affixes[0] !== undefined) {
-      return `${affixes[0]} ${fileName.substr(0, 19 - affixes[0].length)}`;
+      return `${affixes[0]} ${fileName.substring(0, 19 - affixes[0].length)}`;
     } else {
       return `${fileName}`;
     }
